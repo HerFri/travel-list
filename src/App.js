@@ -59,8 +59,7 @@ function Form({ onAddItems }) {
       value={quantity}
       onChange={(e) => setQuantity(Number(e.target.value))}
       >
-        {Array.from({length: 20}, (_, i) => i + 1).
-        map(num=> (
+        {Array.from({length: 20}, (_, i) => i + 1).map(num=> (
           <option value={num} key={num}>
             {num}
           </option>
@@ -77,10 +76,26 @@ function Form({ onAddItems }) {
 }
 
 function PackingList({ items, onDeleteItem, onToggleItem }) {
+  const [sortBy, setSortBy] = useState("input");
+
+  let sortedItems;
+  
+  if(sortBy === "input") sortedItems = items;
+
+  if(sortBy === "description")
+    sortedItems = items
+      .slice()
+      .sort((a,b) => a.description.localeCompare(b.description));
+  
+  if (sortBy === "packed")
+    sortedItems = items
+      .slice()
+      .sort((a,b) => Number(a.packed) - Number(b.packed));
+
   return (
     <div className="list">
       <ul>
-        {items.map((item) => (
+        {sortedItems.map((item) => (
           <Item
             item={item} 
             onDeleteItem={onDeleteItem}
@@ -88,6 +103,15 @@ function PackingList({ items, onDeleteItem, onToggleItem }) {
             key={item.id} />
         ))}
       </ul>
+
+      <div className="actions">
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="input">Sort by input order</option>
+          <option value="description">Sort by description</option>
+          <option value="packed">Sort by packed status</option>
+        </select>
+      </div>
+
     </div>
   );
 }
